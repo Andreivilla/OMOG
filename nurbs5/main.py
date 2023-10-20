@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 pygame.init()
 
 #cores
@@ -10,7 +11,8 @@ GREY = (128, 128, 128)
 BLACK = (0, 0, 0)
 
 # Defina a largura e altura da janela
-WIDTH, HEIGHT = 800, 600#fazer maior que os pontos ne
+WR, HR = 8, 6
+WIDTH, HEIGHT = 100*WR, 100*HR#800, 600#fazer maior que os pontos ne
 
 # crie a janela pygame
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -22,18 +24,42 @@ def bezier(p0, p1, p2, p3, t):
     y = (1 - t) ** 3 * p0[1] + 3 * (1 - t) ** 2 * t * p1[1] + 3 * (1 - t) * t ** 2 * p2[1] + t ** 3 * p3[1]
     return x, y
 
-#quatro pontos inicial (grau3)
-p0 = [100, 300]
-p1 = [300, 100]
-p2 = [500, 500]
-p3 = [700, 300]
+# Função da curva NURBS de grau 5
+# Função para calcular as funções de base de Bernstein
+def basis(i, n, t):
+    if n == 0:
+        return 1 if i == 0 else 0
+    return (t * basis(i, n - 1, t) + (1 - t) * basis(i - 1, n - 1, t))
 
-p0_label = "P0 (100, 300)"
-p1_label = "P1 (300, 100)"
-p2_label = "P2 (500, 500)"
-p3_label = "P3 (700, 300)"
+def nurbs(points, weights, t):
+    n = len(points)
+    x_numer = 0
+    y_numer = 0
+    denom = 0
 
-points = [(p0, p0_label), (p1, p1_label), (p2, p2_label), (p3, p3_label)]
+    for i in range(n):
+        blend = (weights[i] * basis(i, 5, t))
+        x_numer += points[i][0][0] * blend
+        y_numer += points[i][0][1] * blend
+        denom += blend
+
+    x = x_numer / denom
+    y = y_numer / denom
+    return x, y
+
+#função que gera pontos
+def create_points(n, w_base, h_base):
+    p = []
+    r = 100
+    
+    for i in range(n):
+        w = r*random.randint(1, w_base)
+        h = r*random.randint(1, h_base)
+        p.append(([w, h], 'P{} ({}, {})'.format(i, w, h)))
+
+    return p
+
+points = create_points(6 , WR, HR)#[(p0, p0_label), (p1, p1_label), (p2, p2_label), (p3, p3_label)]
 
 #t da formula
 t = 0.0
@@ -69,7 +95,10 @@ while running:
         t = 0.0
 
     #calcula os pontos de bezier
-    x, y = bezier(*[p for p, _ in points], t)
+#    x, y = bezier(*[p for p, _ in points], t)
+    weights = [1, 1, 2, 1, 1, 1]
+    x, y = nurbs(points, weights, t)
+    #x, y = 0, 0
     curve_points.append((int(x), int(y)))
 
     if len(curve_points) > 1:
