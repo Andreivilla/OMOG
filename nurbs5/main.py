@@ -14,16 +14,15 @@ GREY = (128, 128, 128)
 BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
 
-# Defina a largura e altura da janela
+#define o tamanho da janela 
 WIDTH, HEIGHT = 1000, 800
 
-# Crie a janela pygame
+#janela
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Bezier 3 com Nurbs 5")
 
 points = []
 #pontos da curva
-# Desenha a curva através dos pontos
 #para poder ter cores diferentes
 curve_points_bezier = []
 curve_points_nurbs = []
@@ -49,8 +48,8 @@ while running:
     font = pygame.font.Font(None, 24)
     legend_text = '''
     Clique para gerar os pontos 
-    Os 4 primeiros gerarão a curva bezier 
-    Os 4 seguintes gerarão a curva nurbs 
+    Os 4 primeiros geram a curva bezier 
+    Os 4 seguintes geram a curva nurbs 
     C para limpar a tela'''
     lines = legend_text.split('\n')
     line_height = 24  # tamanho da fonte
@@ -84,7 +83,7 @@ while running:
         curve_points_nurbs = Nurbs5(points).curve_points()
         pygame.draw.lines(screen, YELLOW, False, curve_points_nurbs, 2)
 
-    # Atualize a tela
+    # atualize a tela
     pygame.display.flip()
 
     pygame.time.delay(10)
