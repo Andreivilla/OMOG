@@ -94,16 +94,13 @@ while running:
             curve_points_nurbs = Nurbs5(points).curve_points()
             pygame.draw.lines(screen, YELLOW, False, curve_points_nurbs, 2)
 
-            #points[2] = G(curve_points_bezier, curve_points_nurbs).g1()
+            #suavizar ao clicar s(smooth)
             if smooth == True:
                 g = G(points)
-                points = g.g2()
-                points = g.g1()                
-                #points[len(points)-2] = g.g1()#bezier 2 = 2*nurbs 0 - nurbs 1
-                #g.g2(points)
+                points = g.g1()
+                points = g.g2() 
 
             curve_points_bezier = Bezier3(points).curve_points()
-            #points[5], points[6], points[7] = g.g2()
         else:
             curve_points_bezier = Bezier3(points).curve_points()
         pygame.draw.lines(screen, RED, False, curve_points_bezier, 2)
