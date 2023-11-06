@@ -1,10 +1,8 @@
 import pygame
 import sys
-import numpy as np
-from bezier3 import Bezier3
-#from nurbs5 import Nurbs5
-from nurbs5 import Nurbs5
-from g import G
+from src import Bezier3
+from src import Nurbs5
+from src import G
 
 pygame.init()
 
@@ -25,10 +23,9 @@ pygame.display.set_caption("Bezier 3 com Nurbs 5")
 
 
 smooth = False
-#points = []
-points = [([88, 536], 'P0 (88, 536)'), ([136, 274], 'P1 (136, 274)'), ([171, 502], 'P2 (171, 502)'), ([220, 227], 'P3 (220, 227)'), ([257, 499], 'P4 (257, 499)'), ([306, 234], 'P5 (306, 234)'), ([330, 432], 'P6 (330, 432)'), ([417, 210], 'P7 (417, 210)'), ([457, 411], 'P8 (457, 411)')]
 
-#pontos da curva
+points = []
+
 #para poder ter cores diferentes
 curve_points_bezier = []
 curve_points_nurbs = []
@@ -48,9 +45,13 @@ while running:
                 points = []
                 curve_points = []
                 smooth = False
-            if event.key == pygame.K_s:
-                smooth = True
 
+            if event.key == pygame.K_s:
+                if smooth == None:
+                    continue
+                else:
+                    smooth = True
+                
     # Limpa a tela
     screen.fill(WHITE)
     #digita legenda
@@ -59,7 +60,8 @@ while running:
     Clique para gerar os pontos 
     Os 4 primeiros geram a curva bezier 
     Os 4 seguintes geram a curva nurbs 
-    C para limpar a tela'''
+    C para limpar a tela
+    S para suavizar'''
     lines = legend_text.split('\n')
     line_height = 24  # tamanho da fonte
     xtxt, ytxt = 10, 10
@@ -68,8 +70,7 @@ while running:
         screen.blit(text, (xtxt, ytxt))
         ytxt += line_height  #escreve na linha de baixo
     
-    # Desenha marcadores nos pontos de controle
-    
+    # Desenha marcadores nos pontos de controle    
     for (x, y), _ in points:
         pygame.draw.circle(screen, GREEN, (x, y), 5)
 
@@ -83,22 +84,18 @@ while running:
         text = font.render(label, True, BLACK)
         screen.blit(text, (x + 10, y - 20))
 
-    #Otavio UDESC: G1 o segundo ponto da segunda curva é movido para fazer ele colinear com o penúltimo e último ponto da primeira curva
-    #Otavio UDESC: G2 é sobre o ângulo entre os três últimos pontos da primeira curva, que tem que fazer o ângulo dos três primeiros pontos da segunda se igual
-
     #calcula os pontos da curva de bezier
-    #bezier nurbs 
-    #zap é nurbs bezier ta td invertido então
     if len(points)>3:
         if  len(points) > 8:
             curve_points_nurbs = Nurbs5(points).curve_points()
             pygame.draw.lines(screen, YELLOW, False, curve_points_nurbs, 2)
 
             #suavizar ao clicar s(smooth)
-            if smooth == True:
-                g = G(points)
-                points = g.g1()
-                points = g.g2() 
+            if smooth == True:                
+                points = G(points).g1()
+                points = G(points).g2()
+                smooth = None
+                
 
             curve_points_bezier = Bezier3(points).curve_points()
         else:
